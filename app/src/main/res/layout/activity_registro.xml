@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent">
+
+
+    <TableRow
+        android:padding="5dp"
+        android:gravity="center"
+        >
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_gravity="center"
+            android:layout_height="wrap_content"
+            android:layout_span="0"
+            android:text="Registrar lugar"
+            android:textColor="#ff5656b8"
+            android:textStyle="bold"
+            android:textSize="20sp"
+            android:id="@+id/textViewRegistrarLugar" />
+    </TableRow>
+
+    <TableRow
+        android:layout_marginTop="10dip">
+
+        <TextView
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="Lugar:"
+            android:textSize="20sp"
+            android:textColor="#000"
+            android:layout_marginLeft="25dip"
+            android:id="@+id/textViewLugar"
+            android:layout_column="0" />
+
+    </TableRow>
+
+    <TableRow
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <EditText
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:inputType="textPersonName"
+            android:ems="10"
+            android:id="@+id/editTextLugar"
+            android:layout_column="0"
+            android:hint="Name" />
+    </TableRow>
+
+    <TableRow
+        android:layout_marginTop="10dip">
+
+        <TextView
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="Coordenadas:"
+            android:textColor="#000"
+            android:textSize="20sp"
+            android:layout_marginLeft="25dip"
+            android:id="@+id/textViewCoordenadas" />
+
+
+    </TableRow>
+    <TableRow
+       android:layout_marginTop="5dp"
+        android:gravity="center"
+        android:id="@+id/is">
+
+        <TextView
+            android:textSize="20sp"
+            android:textColor="#000"
+            android:id="@+id/textViewCordenadas"
+
+            android:layout_column="0"
+            android:hint="Latitud\nLongitud\nAltitud" />
+    </TableRow>
+
+    <TableRow
+    android:layout_marginTop="20dip"
+    android:gravity="center"
+    >
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Registrar"
+        android:id="@+id/buttonRegistro" />
+</TableRow>
+
+    <TableRow
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="botonMap"
+            android:id="@+id/botonMap"
+            android:layout_column="0" />
+    </TableRow>
+</TableLayout>
