@@ -35,7 +35,7 @@ public class ActivityMaps extends android.support.v4.app.FragmentActivity implem
     private GoogleMap mapa = null;
     private int vista = 0;
     private ImageView speechButton;
-    private TextToSpeech engine;
+    private TextToSpeech engine,textToSpeech;
     private EditText editText;
     private SeekBar seekPitch;
     private SeekBar seekSpeed;
@@ -47,10 +47,9 @@ public class ActivityMaps extends android.support.v4.app.FragmentActivity implem
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_activity_maps);
 
-        mapa = ((SupportMapFragment) getSupportFragmentManager()
-                .findFragmentById(R.id.map)).getMap();
+        mapa = ((SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map)).getMap();
 
-        mapa.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
+/*        mapa.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
             public void onMapClick(LatLng point) {
                 Projection proj = mapa.getProjection();
                 Point coord = proj.toScreenLocation(point);
@@ -60,10 +59,9 @@ public class ActivityMaps extends android.support.v4.app.FragmentActivity implem
                         "Click\n" +
                                 "Lat: " + point.latitude + "\n" +
                                 "Lng: " + point.longitude + "\n" +
-                                "X: " + coord.x + " - Y: " + coord.y,
-                        Toast.LENGTH_SHORT).show();
+                                "X: " + coord.x + " - Y: " + coord.y, Toast.LENGTH_SHORT).show();
             }
-        });
+        });*/
 
         mapa.setOnMapLongClickListener(new GoogleMap.OnMapLongClickListener() {
             public void onMapLongClick(LatLng point) {
@@ -80,7 +78,7 @@ public class ActivityMaps extends android.support.v4.app.FragmentActivity implem
             }
         });
 
-        mapa.setOnCameraChangeListener(new GoogleMap.OnCameraChangeListener() {
+        /*mapa.setOnCameraChangeListener(new GoogleMap.OnCameraChangeListener() {
             public void onCameraChange(CameraPosition position) {
                 Toast.makeText(
                         ActivityMaps.this,
@@ -92,7 +90,7 @@ public class ActivityMaps extends android.support.v4.app.FragmentActivity implem
                                 "°ngulo: " + position.tilt,
                         Toast.LENGTH_SHORT).show();
             }
-        });
+        });*/
 
         mapa.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
             public boolean onMarkerClick(Marker marker) {
@@ -104,6 +102,7 @@ public class ActivityMaps extends android.support.v4.app.FragmentActivity implem
                 return false;
             }
         });
+
     }
 
     @Override
@@ -126,15 +125,13 @@ public class ActivityMaps extends android.support.v4.app.FragmentActivity implem
             case R.id.menu_mover:
                 //Centramos el mapa en Espa“a
                 CameraUpdate camUpd1 =
-                        CameraUpdateFactory.newLatLng(new LatLng(40.41, -3.69));
+                        CameraUpdateFactory.newLatLng(new LatLng(32, -115));
                 mapa.moveCamera(camUpd1);
-
-
                 break;
             case R.id.menu_animar:
                 //Centramos el mapa en Espa“a y con nivel de zoom 5
                 CameraUpdate camUpd2 =
-                        CameraUpdateFactory.newLatLngZoom(new LatLng(40.41, -3.69), 5F);
+                        CameraUpdateFactory.newLatLngZoom(new LatLng(32, -115.69), 5F);
                 mapa.animateCamera(camUpd2);
                 break;
             case R.id.menu_3d:
@@ -147,9 +144,9 @@ public class ActivityMaps extends android.support.v4.app.FragmentActivity implem
                         .build();
 
                 CameraUpdate camUpd3 = CameraUpdateFactory.newCameraPosition(camPos);
-
                 mapa.animateCamera(camUpd3);
                 break;
+
             case R.id.menu_posicion:
 
                 CameraPosition camPos2 = mapa.getCameraPosition();
@@ -157,37 +154,22 @@ public class ActivityMaps extends android.support.v4.app.FragmentActivity implem
                /* Toast.makeText(ActivityMaps.this,
                         "Lat: " + pos.latitude + " - Lng: " + pos.longitude,
                         Toast.LENGTH_LONG).show();
-
                 */
                 break;
-
             case R.id.menu_marcadores:
-               // mostrarMarcador(registro.getLatitud(), registro.getLongitud());
-              //  mostrarMarcador(40.5, -3.5);
                 amarcador();
                 break;
-
             case R.id.menu_lineas:
                 mostrarLineas();break;
+            case R.id.menu_hablar:
+                String dat="android android";
+                textToSpeech.setLanguage(new Locale("spa", "ESP"));
+                speech( dat.toString() );
+                break;
         }
         return super.onOptionsItemSelected(item);
     }
-    private void mostrarMarcador(double latitud, double longitud){
 
-        //mapa.addMarker(new MarkerOptions()
-          //              .position(new LatLng(registro.getLatitud(),registro.getLongitud()))
-            //            .title("Lugar: "+registro.getLugar())
-             //);
-        mapa.addMarker(new MarkerOptions()
-                .position(new LatLng(latitud, longitud))
-                .title("Pais: Espa“a"));
-////////////////////////////////////////////
-       LatLng mexico=new LatLng(32.4,-115.5);
-        mapa.addMarker(new MarkerOptions()
-                        .title("Mexico")
-                        .snippet("mex")
-                        .position(mexico));
-    }
     public void amarcador(){
         //Crea una lista vacia de Registro
         List<Registro> lista;
@@ -196,23 +178,20 @@ public class ActivityMaps extends android.support.v4.app.FragmentActivity implem
         for (Registro dato:lista){
             LatLng re=new LatLng(dato.getLatitud(),dato.getLongitud());
             mapa.addMarker(new MarkerOptions()
-                    .title(dato.getLugar())
-                    .snippet(dato.getLugar())
-                    .position(re)
-                                    );
+                            .title(dato.getLugar())
+                            .snippet(dato.getDescripcion())
+                            .position(re)
+
+                                            );
             }
         }
-
     private void mostrarLineas(){
         PolygonOptions lineas=new PolygonOptions()
-          //      .add(new LatLng(registro.getLatitud(),registro.getLongitud()));
+        //      .add(new LatLng(registro.getLatitud(),registro.getLongitud()));
         ///lineas.strokeWidth(8);
         ///lineas.strokeColor(Color.RED);
         ///mapa.addPolygon(lineas)
-        //
-        //
-        //
-                   ;
+ ;
  }
    private void alternarVista() {
         vista = (vista + 1) % 4;
@@ -244,14 +223,20 @@ public class ActivityMaps extends android.support.v4.app.FragmentActivity implem
             Log.d("Speech", "Success!");
             Locale spanish = new Locale("es", "ES");
             engine.setLanguage(spanish);
-        }
+
     }
-    private void speech(String cadena) {
-        String s="horacion";
-        engine.setPitch((float) pitch);
-        engine.setSpeechRate((float) speed);
+    }
+    private void speech(String str) {
+        //String s="horacion";
+        // engine.setPitch((float) pitch);
+        //engine.setSpeechRate((float) speed);
         //engine.speak(editText.getText().toString(), TextToSpeech.QUEUE_FLUSH, null, null);
-        engine.speak(cadena.toString(), TextToSpeech.QUEUE_FLUSH, null);
+        //engine.speak(s.toString(), TextToSpeech.QUEUE_FLUSH, null);
         // engine.speak(s.toString(), TextToSpeech.QUEUE_FLUSH, null);
+
+        textToSpeech.speak(str, TextToSpeech.QUEUE_FLUSH, null);
+        textToSpeech.setSpeechRate( 0.0f );
+        textToSpeech.setPitch(0.0f);
+
     }
 }

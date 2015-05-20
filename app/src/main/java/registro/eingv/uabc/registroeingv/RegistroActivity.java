@@ -32,7 +32,7 @@ import registro.eingv.uabc.registroeingv.lista.ListActivity;
 public class RegistroActivity extends ActionBarActivity implements LocationListener,View.OnClickListener {
     private LocationManager locationManager;
     private ArrayList<Float> puntos;
-    private EditText lugarText;
+    private EditText lugarText,descripcion;
     private TextView coordenadasText;
     private Button guardarBoton,botonMap;
 
@@ -65,6 +65,9 @@ public class RegistroActivity extends ActionBarActivity implements LocationListe
         }
         locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 2000, 1, this);
         lugarText=(EditText)findViewById(R.id.editTextLugar);
+
+        descripcion= (EditText) findViewById(R.id.descripcionId);
+
         coordenadasText=(TextView)findViewById(R.id.textViewCordenadas);
         guardarBoton= (Button) findViewById(R.id.buttonRegistro);
         guardarBoton.setOnClickListener(this);
@@ -92,11 +95,13 @@ public class RegistroActivity extends ActionBarActivity implements LocationListe
 
         if(puntos!= null){
             if(!puntos.isEmpty()) {
-                if(lugarText.getText().length()>=5) {
+                if(lugarText.getText().length()>=2 && descripcion.getText().length()>5 ) {
+
                     registro.setLugar(lugarText.getText().toString());
+                    registro.setDescripcion(descripcion.getText().toString());
                     registro.setLatitud(puntos.get(0));
                     registro.setLongitud(puntos.get(1));
-                    registro.setAltitud(puntos.get(2));
+                    //registro.setAltitud(puntos.get(2));
 
                     SingletonDB.getInstance().getDaoSession().getRegistroDao().insert(registro);
                     miNotificacion("Guardado",Toast.LENGTH_SHORT);
@@ -167,11 +172,11 @@ public class RegistroActivity extends ActionBarActivity implements LocationListe
     @Override
     public void onLocationChanged(Location location) {
 
-        coordenadasText.setText("Latitud: [" + location.getLatitude() + "]\n Longitud: [" + location.getLongitude() + "]\n Altitud: [" + location.getAltitude() + "]");
+        coordenadasText.setText("Latitud: [" + location.getLatitude() + "]\n Longitud: [" + location.getLongitude() +" ]");//+ "]\n Altitud: [" + location.getAltitude() + "]");
         puntos=new ArrayList<>();
         puntos.add((float) location.getLatitude());
         puntos.add((float) location.getLongitude());
-        puntos.add((float) location.getAltitude());
+       // puntos.add((float) location.getAltitude());
     }
     @Override
     public void onStatusChanged(String provider, int status, Bundle extras) {

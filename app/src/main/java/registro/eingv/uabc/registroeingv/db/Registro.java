@@ -12,7 +12,7 @@ public class Registro implements Serializable{
     private Long _id;
     private Float latitud;
     private Float longitud;
-    private Float altitud;
+    private String descripcion;
     private String lugar;
 
     public Registro() {
@@ -22,11 +22,11 @@ public class Registro implements Serializable{
         this._id = _id;
     }
 
-    public Registro(Long _id, Float latitud, Float longitud, Float altitud, String lugar) {
+    public Registro(Long _id, Float latitud, Float longitud, String descripcion, String lugar) {
         this._id = _id;
         this.latitud = latitud;
         this.longitud = longitud;
-        this.altitud = altitud;
+        this.descripcion = descripcion;
         this.lugar = lugar;
     }
 
@@ -54,12 +54,12 @@ public class Registro implements Serializable{
         this.longitud = longitud;
     }
 
-    public Float getAltitud() {
-        return altitud;
+    public String getDescripcion() {
+        return descripcion;
     }
 
-    public void setAltitud(Float altitud) {
-        this.altitud = altitud;
+    public void setDescripcion(String descripcion) {
+        this.descripcion = descripcion;
     }
 
     public String getLugar() {

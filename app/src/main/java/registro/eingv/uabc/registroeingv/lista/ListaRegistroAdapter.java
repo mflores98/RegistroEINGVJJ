@@ -59,8 +59,7 @@ public class ListaRegistroAdapter extends BaseAdapter {
  //           num.setText(this.listaRegistro.get(position).get_id().toString());
             textViewClave.setText(this.listaRegistro.get(position).get_id()+".- "+this.listaRegistro.get(position).getLugar());
 
-            textViewCoordenadas.setText(this.listaRegistro.get(position).getLatitud() + " ," +
-                    " " + this.listaRegistro.get(position).getLongitud()+", "+this.listaRegistro.get(position).getAltitud());
+            textViewCoordenadas.setText(this.listaRegistro.get(position).getLatitud() + " ," +" " + this.listaRegistro.get(position).getLongitud());
 
         }
         return convertView;

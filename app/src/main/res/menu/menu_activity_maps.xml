@@ -34,6 +34,10 @@
         android:orderInCategory="100"
         android:title="Lineas"/>
 
+    <item android:id="@+id/menu_hablar"
+        android:orderInCategory="100"
+        android:title="Hablar"/>
+
 
 
 
