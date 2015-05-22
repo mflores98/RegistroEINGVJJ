@@ -11,6 +11,7 @@ import android.location.LocationProvider;
 import android.speech.tts.TextToSpeech;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.ContextMenu;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -23,13 +24,15 @@ import android.widget.Toast;
 import com.google.android.gms.maps.GoogleMap;
 
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
 
 import registro.eingv.uabc.registroeingv.db.DaoMaster;
 import registro.eingv.uabc.registroeingv.db.Registro;
 import registro.eingv.uabc.registroeingv.lista.ListActivity;
 
 
-public class RegistroActivity extends ActionBarActivity implements LocationListener,View.OnClickListener {
+public class RegistroActivity extends ActionBarActivity implements LocationListener,View.OnClickListener,TextToSpeech.OnInitListener {
     private LocationManager locationManager;
     private ArrayList<Float> puntos;
     private EditText lugarText,descripcion;
@@ -39,6 +42,8 @@ public class RegistroActivity extends ActionBarActivity implements LocationListe
 
     private GoogleMap mapa=null;
     private int vista=0;
+    private TextToSpeech engine;
+    private String frase;
 
 
     @Override
@@ -50,6 +55,7 @@ public class RegistroActivity extends ActionBarActivity implements LocationListe
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_registro);
+        engine = new TextToSpeech(this, this);
 
         //Mostrar en el texto de posicion  "Posicion: [latitud, longitud]"
 
@@ -63,7 +69,7 @@ public class RegistroActivity extends ActionBarActivity implements LocationListe
         if ( !locationManager.isProviderEnabled( LocationManager.GPS_PROVIDER ) ) {
             buildAlertMessageNoGps();
         }
-        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 2000, 1, this);
+        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 20, 1, this);
         lugarText=(EditText)findViewById(R.id.editTextLugar);
 
         descripcion= (EditText) findViewById(R.id.descripcionId);
@@ -97,7 +103,7 @@ public class RegistroActivity extends ActionBarActivity implements LocationListe
             if(!puntos.isEmpty()) {
                 if(lugarText.getText().length()>=2 && descripcion.getText().length()>5 ) {
 
-                    registro.setLugar(lugarText.getText().toString());
+
                     registro.setDescripcion(descripcion.getText().toString());
                     registro.setLatitud(puntos.get(0));
                     registro.setLongitud(puntos.get(1));
@@ -176,7 +182,23 @@ public class RegistroActivity extends ActionBarActivity implements LocationListe
         puntos=new ArrayList<>();
         puntos.add((float) location.getLatitude());
         puntos.add((float) location.getLongitude());
-       // puntos.add((float) location.getAltitude());
+       // puntos.add((float) location.getAltitude());&& (puntos.get(1)<=(-115.068))
+
+        if((puntos.get(0)<=(32.424))){
+            speech("Estas en casa");
+             miNotificacion("Estas en Casa ",Toast.LENGTH_LONG);
+
+        }else
+            if (puntos.get(0)<=32.303){
+                speech("Estas en Laboratorio de ingenieria de software ");
+
+                miNotificacion("Estas en Laboratorio de ingenieria de software ",Toast.LENGTH_LONG);
+
+            }
+
+
+
+
     }
     @Override
     public void onStatusChanged(String provider, int status, Bundle extras) {
@@ -225,4 +247,26 @@ public class RegistroActivity extends ActionBarActivity implements LocationListe
     protected void onDestroy() {
         super.onDestroy();
     }
+
+    /**
+     * Called to signal the completion of the TextToSpeech engine initialization.
+     *
+     * @param status {@link TextToSpeech#SUCCESS} or {@link TextToSpeech#ERROR}.
+     */
+    @Override
+    public void onInit(int status) {
+        Log.d("Speech", "OnInit - Status [" + status + "]");
+        if (status == TextToSpeech.SUCCESS) {
+            Log.d("Speech", "Success!");
+            Locale spanish = new Locale("es", "ES");
+           engine.setLanguage(spanish);
+           //engine.setLanguage(Locale.ENGLISH);
+        }
+
+    }
+    private void speech(String frase) {
+            //  engine.speak((dato.getDescripcion()).toString(),TextToSpeech.QUEUE_ADD,null); ////lee todos los datos
+            //  engine.speak(dato.getLugar().toString(), TextToSpeech.QUEUE_FLUSH,null);
+            engine.speak(frase.toString(), TextToSpeech.QUEUE_FLUSH,null);
+        }
 }

@@ -1,46 +1,59 @@
 
 package registro.eingv.uabc.registroeingv;
 
-import android.content.Context;
+import android.app.Activity;
+import android.os.Bundle;
 import android.speech.tts.TextToSpeech;
 import android.util.Log;
-import android.widget.Toast;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.View;
+import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.SeekBar;
 
-import com.google.android.gms.location.Geofence;
+import java.util.Locale;
 
 import java.util.Locale;
 
 /**
  * Created by Mifc on 5/10/2015.
  */
-public class Voz implements TextToSpeech.OnInitListener{
+public class Voz extends Activity implements TextToSpeech.OnInitListener{
+
+    private ImageView speechButton;
     private TextToSpeech engine;
+    private EditText editText;
+    private SeekBar seekPitch;
+    private SeekBar seekSpeed;
     private double pitch=1.0;
     private double speed=1.0;
-    private Geofence s;
-    private String frase;
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
 
-    public Voz() {
 
-        speak("Registro");
     }
-
-    private void speak( String str )
-    {
-        engine.speak( str, TextToSpeech.QUEUE_FLUSH, null );
-        engine.setSpeechRate(0.0f);
-        engine.setPitch(0.0f);
-    }
-
-
+    /**
+     * Called to signal the completion of the TextToSpeech engine initialization.
+     *
+     * @param status {@link TextToSpeech#SUCCESS} or {@link TextToSpeech#ERROR}.
+     */
     @Override
     public void onInit(int status) {
 
-        if ( status == TextToSpeech.LANG_MISSING_DATA | status == TextToSpeech.LANG_NOT_SUPPORTED ) {
+        Log.d("Speech", "OnInit - Status ["+status+"]");
 
-        System.out.printf("ERROR LANG_MISSING_DATA | LANG_NOT_SUPPORTED");
+        if (status == TextToSpeech.SUCCESS) {
+            Log.d("Speech", "Success!");
+            Locale spanish = new Locale("es", "ES");
+            engine.setLanguage(spanish);
 
+            }
         }
-    }
+
+
+
+
 }
 

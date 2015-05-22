@@ -40,13 +40,6 @@ public class ListActivity extends Activity implements ListView.OnItemClickListen
                 List<Registro> lista;
                 //Obtener la lista de Registros en la BD
                 lista = SingletonDB.getInstance().getDaoSession().getRegistroDao().loadAll();
-
-
-
-
-
-
-
                 if (lista != null) {
                     //Agrega el contexto y lista a la vista ListView
                     ListaRegistroAdapter listaAdapter = new ListaRegistroAdapter(context, lista);
@@ -86,8 +79,7 @@ public class ListActivity extends Activity implements ListView.OnItemClickListen
 
     public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
 
-        ListaRegistroAdapter listaClavesAdapter_ =
-                (ListaRegistroAdapter) adapterView.getAdapter();
+        ListaRegistroAdapter listaClavesAdapter_ =(ListaRegistroAdapter) adapterView.getAdapter();
         Registro reg = (Registro) listaClavesAdapter_.getItem(i);
 
        //Intent intent = new Intent(this, DescripcionClave.class).putExtra("registro", reg.get_id());
@@ -99,13 +91,11 @@ public class ListActivity extends Activity implements ListView.OnItemClickListen
     @Override
     public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
 
-        ListaRegistroAdapter listaClavesAdapter_ =
-                (ListaRegistroAdapter) parent.getAdapter();
+        ListaRegistroAdapter listaClavesAdapter_ =(ListaRegistroAdapter) parent.getAdapter();
 
         Registro reg = (Registro) listaClavesAdapter_.getItem(position);
 
         buildAlertMessageConfiguration(reg);
-
 
       //Toast toast = Toast.makeText(this.onItemLongClick());
         return false;
@@ -119,14 +109,7 @@ public class ListActivity extends Activity implements ListView.OnItemClickListen
                     public void onClick(final DialogInterface dialog, final int id) {
                         //Intent pantallaEdicion = new Intent(getApplicationContext(), ActualizarActivity.class);
                         //pantallaEdicion.putExtra("registroAeditar", reg);
-
-
-
-
-
-
-
-                    }
+           }
                 })
                 .setNegativeButton("Eliminar", new DialogInterface.OnClickListener() {
                     public void onClick(final DialogInterface dialog, final int id) {
@@ -136,7 +119,6 @@ public class ListActivity extends Activity implements ListView.OnItemClickListen
                         dialog.cancel();
                     }
                 })
-
                 .setNeutralButton("No hacer nada", new DialogInterface.OnClickListener() {
                     public void onClick(final DialogInterface dialog, final int id) {
 

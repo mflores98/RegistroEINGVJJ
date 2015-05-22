@@ -8,6 +8,8 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.SeekBar;
@@ -34,20 +36,18 @@ import registro.eingv.uabc.registroeingv.db.RegistroDao;
 public class ActivityMaps extends android.support.v4.app.FragmentActivity implements TextToSpeech.OnInitListener {
     private GoogleMap mapa = null;
     private int vista = 0;
-    private ImageView speechButton;
-    private TextToSpeech engine,textToSpeech;
-    private EditText editText;
-    private SeekBar seekPitch;
-    private SeekBar seekSpeed;
-    private double pitch=1.0;
-    private double speed=1.0;
-
+    private TextToSpeech engine;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_activity_maps);
 
+        engine = new TextToSpeech(this, this);
+
         mapa = ((SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map)).getMap();
+        amarcador();
+        animm();
+
 
 /*        mapa.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
             public void onMapClick(LatLng point) {
@@ -82,27 +82,30 @@ public class ActivityMaps extends android.support.v4.app.FragmentActivity implem
             public void onCameraChange(CameraPosition position) {
                 Toast.makeText(
                         ActivityMaps.this,
-                        "Cambio C∑mara\n" +
+                        "Cambio Camara\n" +
                                 "Lat: " + position.target.latitude + "\n" +
                                 "Lng: " + position.target.longitude + "\n" +
                                 "Zoom: " + position.zoom + "\n" +
-                                "Orientaci€n: " + position.bearing + "\n" +
-                                "°ngulo: " + position.tilt,
+                                "Orientacion: " + position.bearing + "\n" +
+                                "angulo: " + position.tilt,
                         Toast.LENGTH_SHORT).show();
             }
         });*/
 
         mapa.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
             public boolean onMarkerClick(Marker marker) {
+
+                      engine.speak(marker.getSnippet().toString(), TextToSpeech.QUEUE_FLUSH,null);
+
                 Toast.makeText(
                         ActivityMaps.this,
                         "Marcador pulsado:\n" +
                                 marker.getTitle(),
+
                         Toast.LENGTH_SHORT).show();
                 return false;
             }
         });
-
     }
 
     @Override
@@ -117,65 +120,86 @@ public class ActivityMaps extends android.support.v4.app.FragmentActivity implem
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
-
         switch (item.getItemId()){
             case R.id.menu_vista:
                 alternarVista();
                 break;
             case R.id.menu_mover:
-                //Centramos el mapa en Espa“a
-                CameraUpdate camUpd1 =
-                        CameraUpdateFactory.newLatLng(new LatLng(32, -115));
-                mapa.moveCamera(camUpd1);
+                //Crea una lista vacia de Registro
+                List<Registro> lista;
+                //Obtener la lista de Registros en la BD
+                lista = SingletonDB.getInstance().getDaoSession().getRegistroDao().loadAll();
+            for (Registro dato:lista){
+            CameraUpdate camUpd1 =
+            CameraUpdateFactory.newLatLng(new LatLng(dato.getLatitud(), dato.getLongitud()));
+            mapa.moveCamera(camUpd1);
+}
+
+
                 break;
             case R.id.menu_animar:
-                //Centramos el mapa en Espa“a y con nivel de zoom 5
-                CameraUpdate camUpd2 =
-                        CameraUpdateFactory.newLatLngZoom(new LatLng(32, -115.69), 5F);
-                mapa.animateCamera(camUpd2);
+        animm();
                 break;
             case R.id.menu_3d:
-                LatLng mexicali = new LatLng(32.4, -115.5);
-                CameraPosition camPos = new CameraPosition.Builder()
-                        .target(mexicali)   //Centramos el mapa en Madrid
-                        .zoom(19)         //Establecemos el zoom en 19
-                        .bearing(45)      //Establecemos la orientaci€n con el noreste arriba
-                        .tilt(70)         //Bajamos el punto de vista de la c∑mara 70 grados
-                        .build();
+               //Crea una lista vacia de Registro
+                List<Registro> lista2;
+                //Obtener la lista de Registros en la BD
+                lista2 = SingletonDB.getInstance().getDaoSession().getRegistroDao().loadAll();
 
-                CameraUpdate camUpd3 = CameraUpdateFactory.newCameraPosition(camPos);
-                mapa.animateCamera(camUpd3);
+                for (Registro dato:lista2) {
+                LatLng lugar=new LatLng(dato.getLatitud(),dato.getLongitud());
+                    CameraPosition camPos = new CameraPosition.Builder()
+                    .target(lugar).zoom(19).bearing(45).tilt(70).build();
+                    CameraUpdate cameraUpdate=CameraUpdateFactory.newCameraPosition(camPos);
+                    mapa.animateCamera(cameraUpdate);
+                }
                 break;
 
-            case R.id.menu_posicion:
+            /*case R.id.menu_posicion:
 
-                CameraPosition camPos2 = mapa.getCameraPosition();
-                LatLng pos = camPos2.target;
-               /* Toast.makeText(ActivityMaps.this,
+               CameraPosition camPos2 = mapa.getCameraPosition();
+               LatLng pos = camPos2.target;
+                Toast.makeText(ActivityMaps.this,
                         "Lat: " + pos.latitude + " - Lng: " + pos.longitude,
                         Toast.LENGTH_LONG).show();
-                */
-                break;
-            case R.id.menu_marcadores:
-                amarcador();
-                break;
+            break;*/
+
+
+            //case R.id.menu_marcadores:
+              //  amarcador();
+                //break;
             case R.id.menu_lineas:
                 mostrarLineas();break;
             case R.id.menu_hablar:
-                String dat="android android";
-                textToSpeech.setLanguage(new Locale("spa", "ESP"));
-                speech( dat.toString() );
+
+               speech();
                 break;
         }
         return super.onOptionsItemSelected(item);
     }
+    public void animm(){
+        //Centramos el mapa en Espania y con nivel de zoom 5
+        //Crea una lista vacia de Registro
+        List<Registro> lista1;
+        //Obtener la lista de Registros en la BD
+        lista1 = SingletonDB.getInstance().getDaoSession().getRegistroDao().loadAll();
+
+        for (Registro dato:lista1)
+        {
+            CameraUpdate camUpd2 =
+                    CameraUpdateFactory.newLatLngZoom(new LatLng(dato.getLatitud(), dato.getLongitud()), 8F);
+            mapa.animateCamera(camUpd2);
+        }
+
+    }
 
     public void amarcador(){
         //Crea una lista vacia de Registro
-        List<Registro> lista;
+        List<Registro> lista3;
         //Obtener la lista de Registros en la BD
-        lista = SingletonDB.getInstance().getDaoSession().getRegistroDao().loadAll();
-        for (Registro dato:lista){
+        lista3 = SingletonDB.getInstance().getDaoSession().getRegistroDao().loadAll();
+
+        for (Registro dato:lista3){
             LatLng re=new LatLng(dato.getLatitud(),dato.getLongitud());
             mapa.addMarker(new MarkerOptions()
                             .title(dato.getLugar())
@@ -191,7 +215,8 @@ public class ActivityMaps extends android.support.v4.app.FragmentActivity implem
         ///lineas.strokeWidth(8);
         ///lineas.strokeColor(Color.RED);
         ///mapa.addPolygon(lineas)
- ;
+        ;
+
  }
    private void alternarVista() {
         vista = (vista + 1) % 4;
@@ -209,7 +234,7 @@ public class ActivityMaps extends android.support.v4.app.FragmentActivity implem
             case 3:
                 mapa.setMapType(GoogleMap.MAP_TYPE_TERRAIN);
                 break;
-        }
+           }
     }
     /**
      * Called to signal the completion of the TextToSpeech engine initialization.
@@ -221,22 +246,19 @@ public class ActivityMaps extends android.support.v4.app.FragmentActivity implem
 
         if (status == TextToSpeech.SUCCESS) {
             Log.d("Speech", "Success!");
-            Locale spanish = new Locale("es", "ES");
+        Locale spanish = new Locale("es", "ES");
             engine.setLanguage(spanish);
-
+            //engine.setLanguage(Locale.ENGLISH);
+        }
     }
-    }
-    private void speech(String str) {
-        //String s="horacion";
-        // engine.setPitch((float) pitch);
-        //engine.setSpeechRate((float) speed);
-        //engine.speak(editText.getText().toString(), TextToSpeech.QUEUE_FLUSH, null, null);
-        //engine.speak(s.toString(), TextToSpeech.QUEUE_FLUSH, null);
-        // engine.speak(s.toString(), TextToSpeech.QUEUE_FLUSH, null);
-
-        textToSpeech.speak(str, TextToSpeech.QUEUE_FLUSH, null);
-        textToSpeech.setSpeechRate( 0.0f );
-        textToSpeech.setPitch(0.0f);
-
+        private void speech() {
+            List<Registro> list;
+            list=SingletonDB.getInstance().getDaoSession().getRegistroDao().loadAll();
+            for (Registro dato:list){
+//                engine.speak((dato.getDescripcion()).toString(),TextToSpeech.QUEUE_ADD,null); ////lee todo los datos
+              //  engine.speak(dato.getLugar().toString(), TextToSpeech.QUEUE_FLUSH,null);
+                engine.speak(dato.getDescripcion().toString(), TextToSpeech.QUEUE_FLUSH,null);
+            }
+//                engine.speak(s.toString(), TextToSpeech.QUEUE_FLUSH, null);
     }
 }
