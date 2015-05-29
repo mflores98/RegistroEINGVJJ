@@ -2,6 +2,7 @@ package registro.eingv.uabc.registroeingv;
 
 import android.graphics.Color;
 import android.graphics.Point;
+import android.location.Location;
 import android.speech.tts.TextToSpeech;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
@@ -15,6 +16,9 @@ import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.Toast;
 
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.Geofence;
+import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -26,6 +30,7 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolygonOptions;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
@@ -37,6 +42,8 @@ public class ActivityMaps extends android.support.v4.app.FragmentActivity implem
     private GoogleMap mapa = null;
     private int vista = 0;
     private TextToSpeech engine;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -47,7 +54,6 @@ public class ActivityMaps extends android.support.v4.app.FragmentActivity implem
         mapa = ((SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map)).getMap();
         amarcador();
         animm();
-
 
 /*        mapa.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
             public void onMapClick(LatLng point) {
@@ -107,6 +113,8 @@ public class ActivityMaps extends android.support.v4.app.FragmentActivity implem
             }
         });
     }
+
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {

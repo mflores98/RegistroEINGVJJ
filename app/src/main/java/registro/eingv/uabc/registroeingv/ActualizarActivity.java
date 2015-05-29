@@ -30,7 +30,6 @@ public class ActualizarActivity extends ActionBarActivity implements View.OnClic
        // guardarCoordenadas = (Button) findViewById(R.id.buttonRegistroPosicion);
         guardarCoordenadas.setOnClickListener(this);
 
-
     }
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {

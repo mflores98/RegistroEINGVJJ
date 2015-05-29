@@ -52,14 +52,12 @@ public class ListaRegistroAdapter extends BaseAdapter {
 
         if(!this.listaRegistro.isEmpty()) {
 
-            TextView num= (TextView) convertView.findViewById(R.id.numId);
             TextView textViewClave=(TextView)convertView.findViewById(R.id.textViewClave);
             TextView textViewCoordenadas=(TextView)convertView.findViewById(R.id.textViewCoordenadas);
 
- //           num.setText(this.listaRegistro.get(position).get_id().toString());
-            textViewClave.setText(this.listaRegistro.get(position).get_id()+".- "+this.listaRegistro.get(position).getLugar());
+            textViewClave.setText(this.listaRegistro.get(position).get_id()+": "+this.listaRegistro.get(position).getLugar());
 
-            textViewCoordenadas.setText(this.listaRegistro.get(position).getLatitud() + " ," +" " + this.listaRegistro.get(position).getLongitud());
+            textViewCoordenadas.setText("[ "+this.listaRegistro.get(position).getLatitud() + " ] , [ "  + this.listaRegistro.get(position).getLongitud()+ "]");
 
         }
         return convertView;

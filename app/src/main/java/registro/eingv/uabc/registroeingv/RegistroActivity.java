@@ -21,6 +21,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.location.Geofence;
 import com.google.android.gms.maps.GoogleMap;
 
 import java.util.ArrayList;
@@ -35,15 +36,17 @@ import registro.eingv.uabc.registroeingv.lista.ListActivity;
 public class RegistroActivity extends ActionBarActivity implements LocationListener,View.OnClickListener,TextToSpeech.OnInitListener {
     private LocationManager locationManager;
     private ArrayList<Float> puntos;
-    private EditText lugarText,descripcion;
+    private EditText  descripcion;
     private TextView coordenadasText;
     private Button guardarBoton,botonMap;
+    private EditText nombreLugar;
 
 
     private GoogleMap mapa=null;
     private int vista=0;
     private TextToSpeech engine;
     private String frase;
+
 
 
     @Override
@@ -55,38 +58,27 @@ public class RegistroActivity extends ActionBarActivity implements LocationListe
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_registro);
+        nombreLugar= (EditText) findViewById(R.id.nombreLugarId);
+        descripcion= (EditText) findViewById(R.id.descripcionId);
+        coordenadasText=(TextView)findViewById(R.id.textViewCordenadas);
+        guardarBoton= (Button) findViewById(R.id.buttonRegistro);
+        guardarBoton.setOnClickListener(this);
+        botonMap= (Button) findViewById(R.id.botonMap);
+        botonMap.setOnClickListener(this);
         engine = new TextToSpeech(this, this);
+         initDataBase();
 
-        //Mostrar en el texto de posicion  "Posicion: [latitud, longitud]"
-
-        //Un boton para guardar la posicion en la base de datos
-        initDataBase();
-//  List<Registro> reg=SingletonDB.getInstance().getDaoSession().getRegistroDao().loadAll();
-  // for(Registro registro:reg){
- //System.out.println(registro.getLugar());
-  //}
+    //    List<Registro> reg=SingletonDB.getInstance().getDaoSession().getRegistroDao().loadAll();
+    //for(Registro registro:reg){
+    //System.out.println(registro.getLugar());
+    //}
         locationManager = (LocationManager) getSystemService(this.LOCATION_SERVICE);
         if ( !locationManager.isProviderEnabled( LocationManager.GPS_PROVIDER ) ) {
             buildAlertMessageNoGps();
         }
-        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 20, 1, this);
-        lugarText=(EditText)findViewById(R.id.editTextLugar);
+        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 200, 2, this);
 
-        descripcion= (EditText) findViewById(R.id.descripcionId);
-
-        coordenadasText=(TextView)findViewById(R.id.textViewCordenadas);
-        guardarBoton= (Button) findViewById(R.id.buttonRegistro);
-        guardarBoton.setOnClickListener(this);
-
-        botonMap= (Button) findViewById(R.id.botonMap);
-        botonMap.setOnClickListener(this);
-
-    }
-    /**
-     * Called when a view has been clicked.
-     *
-     * @param v The view that was clicked.
-     */
+        }
     @Override
     public void onClick(View v) {
         switch (v.getId()){
@@ -101,17 +93,17 @@ public class RegistroActivity extends ActionBarActivity implements LocationListe
 
         if(puntos!= null){
             if(!puntos.isEmpty()) {
-                if(lugarText.getText().length()>=2 && descripcion.getText().length()>5 ) {
+                if(nombreLugar.getText().length()>=2 && descripcion.getText().length()>5 ) {
 
-
+                    registro.setLugar(nombreLugar.getText().toString());
                     registro.setDescripcion(descripcion.getText().toString());
                     registro.setLatitud(puntos.get(0));
                     registro.setLongitud(puntos.get(1));
                     //registro.setAltitud(puntos.get(2));
 
                     SingletonDB.getInstance().getDaoSession().getRegistroDao().insert(registro);
-                    miNotificacion("Guardado",Toast.LENGTH_SHORT);
-                    //        lugarText.setText("");
+                    miNotificacion("Guardado", Toast.LENGTH_SHORT);
+                    nombreLugar.setText("");
                 }else{
                     miNotificacion("Ingresa un nombre mayor a 5 caracteres",Toast.LENGTH_SHORT);
                 }
@@ -184,20 +176,20 @@ public class RegistroActivity extends ActionBarActivity implements LocationListe
         puntos.add((float) location.getLongitude());
        // puntos.add((float) location.getAltitude());&& (puntos.get(1)<=(-115.068))
 
-        if((puntos.get(0)<=(32.424))){
+        if((puntos.get(0)<=(32.424)) && (puntos.get(1)<=(-115.068)))
+        {
             speech("Estas en casa");
-             miNotificacion("Estas en Casa ",Toast.LENGTH_LONG);
+         //    miNotificacion("Estas en Casa ",Toast.LENGTH_LONG);
 
-        }else
+
+        }
+        /*else
             if (puntos.get(0)<=32.303){
                 speech("Estas en Laboratorio de ingenieria de software ");
 
                 miNotificacion("Estas en Laboratorio de ingenieria de software ",Toast.LENGTH_LONG);
 
-            }
-
-
-
+            }*/
 
     }
     @Override
@@ -237,8 +229,13 @@ public class RegistroActivity extends ActionBarActivity implements LocationListe
     }
     @Override
     protected void onPause() {
+        if(engine !=null){
+            engine.stop();
+            engine.shutdown();
+        }
         super.onPause();
     }
+
     @Override
     protected void onResume() {
         super.onResume();
@@ -262,11 +259,14 @@ public class RegistroActivity extends ActionBarActivity implements LocationListe
            engine.setLanguage(spanish);
            //engine.setLanguage(Locale.ENGLISH);
         }
-
     }
+
     private void speech(String frase) {
             //  engine.speak((dato.getDescripcion()).toString(),TextToSpeech.QUEUE_ADD,null); ////lee todos los datos
             //  engine.speak(dato.getLugar().toString(), TextToSpeech.QUEUE_FLUSH,null);
             engine.speak(frase.toString(), TextToSpeech.QUEUE_FLUSH,null);
+            engine.stop();
         }
+
+
 }

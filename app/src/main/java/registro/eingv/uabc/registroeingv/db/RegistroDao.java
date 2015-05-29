@@ -40,13 +40,15 @@ public class RegistroDao extends AbstractDao<Registro, Long> {
 
     /** Creates the underlying database table. */
     public static void createTable(SQLiteDatabase db, boolean ifNotExists) {
-        String constraint = ifNotExists? "IF NOT EXISTS ": "";
+        String constraint = ifNotExists ? "IF NOT EXISTS " : "";
         db.execSQL("CREATE TABLE " + constraint + "'REGISTRO' (" + //
                 "'_ID' INTEGER PRIMARY KEY ," + // 0: _id
                 "'LATITUD' REAL," + // 1: latitud
                 "'LONGITUD' REAL," + // 2: longitud
                 "'DESCRIPCION' TEXT," + // 3: descripcion
                 "'LUGAR' TEXT);"); // 4: lugar
+
+
     }
 
     /** Drops the underlying database table. */
@@ -59,7 +61,7 @@ public class RegistroDao extends AbstractDao<Registro, Long> {
     @Override
     protected void bindValues(SQLiteStatement stmt, Registro entity) {
         stmt.clearBindings();
- 
+
         Long _id = entity.get_id();
         if (_id != null) {
             stmt.bindLong(1, _id);
@@ -84,6 +86,7 @@ public class RegistroDao extends AbstractDao<Registro, Long> {
         if (lugar != null) {
             stmt.bindString(5, lugar);
         }
+
     }
 
     /** @inheritdoc */
