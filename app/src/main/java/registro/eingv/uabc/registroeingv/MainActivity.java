@@ -1,5 +1,6 @@
 package registro.eingv.uabc.registroeingv;
 
+import android.content.ContentValues;
 import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
@@ -60,6 +61,7 @@ public class MainActivity extends ActionBarActivity {
         });
 
     }
+
     public void cambiarVistaRegistro(){
 
         Intent intent = new Intent(this, RegistroActivity.class);

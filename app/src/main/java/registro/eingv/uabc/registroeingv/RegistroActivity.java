@@ -1,13 +1,17 @@
 package registro.eingv.uabc.registroeingv;
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.location.LocationProvider;
+import android.provider.MediaStore;
 import android.speech.tts.TextToSpeech;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
@@ -18,12 +22,11 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
-
-import com.google.android.gms.location.Geofence;
 import com.google.android.gms.maps.GoogleMap;
-
+import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -41,12 +44,19 @@ public class RegistroActivity extends ActionBarActivity implements LocationListe
     private Button guardarBoton,botonMap;
     private EditText nombreLugar;
 
-
+    private Intent intent;
+    final static int constante=0;
+    private Bitmap bmp=null;
     private GoogleMap mapa=null;
     private int vista=0;
     private TextToSpeech engine;
     private String frase;
+    private ImageView imageView;
+    private  byte[] byteArray=null;
 
+
+    //Insertar datos de Registro
+    Registro registro=new Registro();
 
 
     @Override
@@ -58,6 +68,7 @@ public class RegistroActivity extends ActionBarActivity implements LocationListe
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_registro);
+
         nombreLugar= (EditText) findViewById(R.id.nombreLugarId);
         descripcion= (EditText) findViewById(R.id.descripcionId);
         coordenadasText=(TextView)findViewById(R.id.textViewCordenadas);
@@ -66,8 +77,12 @@ public class RegistroActivity extends ActionBarActivity implements LocationListe
         botonMap= (Button) findViewById(R.id.botonMap);
         botonMap.setOnClickListener(this);
         engine = new TextToSpeech(this, this);
-         initDataBase();
 
+
+
+
+
+        initDataBase();
     //    List<Registro> reg=SingletonDB.getInstance().getDaoSession().getRegistroDao().loadAll();
     //for(Registro registro:reg){
     //System.out.println(registro.getLugar());
@@ -77,7 +92,6 @@ public class RegistroActivity extends ActionBarActivity implements LocationListe
             buildAlertMessageNoGps();
         }
         locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 200, 2, this);
-
         }
     @Override
     public void onClick(View v) {
@@ -86,24 +100,29 @@ public class RegistroActivity extends ActionBarActivity implements LocationListe
             case R.id.botonMap: todd();break;
         }
     }
+
     public  void  regiss(){
-        //Insertar datos de Registro
-        Registro registro=new Registro();
         //Validar y llenar
+
+        Bitmap imagenAndroid = BitmapFactory.decodeResource(getResources(), R.drawable.uabc);
+
+        //ImageView imageView= (ImageView) findViewById(R.id.imID);
+
+//        ByteArrayOutputStream stream = new ByteArrayOutputStream();
+  //      imagenAndroid.compress(Bitmap.CompressFormat.PNG,0,stream);
+
+    //    byte[] bitmapdata = stream.toByteArray();//EN bitmapdata se encuentra almacenada la imagen en biytes
+
+   //     Bitmap bitmap= BitmapFactory.decodeByteArray(bitmapdata, 0, bitmapdata.length);
+     //   imageView.setImageBitmap(bitmap);
+
 
         if(puntos!= null){
             if(!puntos.isEmpty()) {
-                if(nombreLugar.getText().length()>=2 && descripcion.getText().length()>5 ) {
+                if(nombreLugar.getText().length()>=2 && descripcion.getText().length() > 2 ) {
 
-                    registro.setLugar(nombreLugar.getText().toString());
-                    registro.setDescripcion(descripcion.getText().toString());
-                    registro.setLatitud(puntos.get(0));
-                    registro.setLongitud(puntos.get(1));
-                    //registro.setAltitud(puntos.get(2));
+                    toma();//toma foto e inserta en la base de datos
 
-                    SingletonDB.getInstance().getDaoSession().getRegistroDao().insert(registro);
-                    miNotificacion("Guardado", Toast.LENGTH_SHORT);
-                    nombreLugar.setText("");
                 }else{
                     miNotificacion("Ingresa un nombre mayor a 5 caracteres",Toast.LENGTH_SHORT);
                 }
@@ -119,6 +138,47 @@ public class RegistroActivity extends ActionBarActivity implements LocationListe
         Intent intent=new Intent(getApplicationContext(),ActivityMaps.class);
         startActivity(intent);
     }
+    private void toma() {
+        intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        startActivityForResult(intent, constante);
+    }
+
+        protected void onActivityResult(int request, int resultCode, Intent data) {
+            super.onActivityResult(request, resultCode, data);
+
+
+            if (resultCode== Activity.RESULT_OK){
+                List<Registro> lista;
+                lista=SingletonDB.getInstance().getDaoSession().getRegistroDao().loadAll();
+                System.out.printf(String.valueOf(lista.size())+" dato ");
+                int contador=0;
+                contador=lista.size() + 1;
+
+                Bundle ext=data.getExtras();
+                bmp=(Bitmap)ext.get("data");//en bmp se localiza la foto tomada
+                ByteArrayOutputStream stream=new ByteArrayOutputStream();
+                bmp.compress(Bitmap.CompressFormat.PNG,0,stream);
+                byteArray=stream.toByteArray();
+                //valida que byteArray este lleno para que se almacene en la base de datos,
+                //ya que si se almacena la imagen en la base como null causa error al visualizar
+                if (byteArray!=null){
+                    registro.set_id((long) contador);
+                    registro.setImagen(byteArray);
+                    registro.setLugar(nombreLugar.getText().toString());
+                    registro.setDescripcion(descripcion.getText().toString());
+                    registro.setLatitud(puntos.get(0));
+                    registro.setLongitud(puntos.get(1));
+                    SingletonDB.getInstance().getDaoSession().getRegistroDao().insert(registro);
+                    miNotificacion("Dato almacenado", Toast.LENGTH_SHORT);
+                    nombreLugar.setText("");
+                }
+
+            }
+
+        }
+
+
+
 
     public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo){
         super.onCreateContextMenu(menu, v, menuInfo);
@@ -178,8 +238,8 @@ public class RegistroActivity extends ActionBarActivity implements LocationListe
 
         if((puntos.get(0)<=(32.424)) && (puntos.get(1)<=(-115.068)))
         {
-            speech("Estas en casa");
-         //    miNotificacion("Estas en Casa ",Toast.LENGTH_LONG);
+        //    speech("Estas en casa");
+             miNotificacion("Estas en Casa ",Toast.LENGTH_LONG);
 
 
         }
@@ -188,9 +248,7 @@ public class RegistroActivity extends ActionBarActivity implements LocationListe
                 speech("Estas en Laboratorio de ingenieria de software ");
 
                 miNotificacion("Estas en Laboratorio de ingenieria de software ",Toast.LENGTH_LONG);
-
             }*/
-
     }
     @Override
     public void onStatusChanged(String provider, int status, Bundle extras) {
@@ -235,7 +293,6 @@ public class RegistroActivity extends ActionBarActivity implements LocationListe
         }
         super.onPause();
     }
-
     @Override
     protected void onResume() {
         super.onResume();
@@ -244,7 +301,6 @@ public class RegistroActivity extends ActionBarActivity implements LocationListe
     protected void onDestroy() {
         super.onDestroy();
     }
-
     /**
      * Called to signal the completion of the TextToSpeech engine initialization.
      *
@@ -260,13 +316,10 @@ public class RegistroActivity extends ActionBarActivity implements LocationListe
            //engine.setLanguage(Locale.ENGLISH);
         }
     }
-
     private void speech(String frase) {
             //  engine.speak((dato.getDescripcion()).toString(),TextToSpeech.QUEUE_ADD,null); ////lee todos los datos
             //  engine.speak(dato.getLugar().toString(), TextToSpeech.QUEUE_FLUSH,null);
             engine.speak(frase.toString(), TextToSpeech.QUEUE_FLUSH,null);
             engine.stop();
         }
-
-
 }

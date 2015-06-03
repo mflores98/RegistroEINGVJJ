@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -15,7 +14,7 @@ import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
-import registro.eingv.uabc.registroeingv.ActualizarActivity;
+
 import registro.eingv.uabc.registroeingv.R;
 import registro.eingv.uabc.registroeingv.SingletonDB;
 import registro.eingv.uabc.registroeingv.db.Registro;
@@ -36,7 +35,6 @@ public class ListActivity extends Activity implements ListView.OnItemClickListen
         runOnUiThread(new Runnable() {
             public void run() {
                 //Crea una lista vacia de Registro
-
                 List<Registro> lista;
                 //Obtener la lista de Registros en la BD
                 lista = SingletonDB.getInstance().getDaoSession().getRegistroDao().loadAll();
@@ -102,6 +100,7 @@ public class ListActivity extends Activity implements ListView.OnItemClickListen
     }
     private void buildAlertMessageConfiguration(final Registro reg) {
         final AlertDialog.Builder builder = new AlertDialog.Builder(this);
+
         builder.setMessage("¿Que deceas hacer?")
                 .setCancelable(false)
                 .setPositiveButton("Editar", new DialogInterface.OnClickListener() {
@@ -113,7 +112,6 @@ public class ListActivity extends Activity implements ListView.OnItemClickListen
                 })
                 .setNegativeButton("Eliminar", new DialogInterface.OnClickListener() {
                     public void onClick(final DialogInterface dialog, final int id) {
-
                         SingletonDB.getInstance().getDaoSession().getRegistroDao().deleteByKey(reg.get_id());
                         miNotificacion("Eliminado!");
                         dialog.cancel();
@@ -122,7 +120,7 @@ public class ListActivity extends Activity implements ListView.OnItemClickListen
                 .setNeutralButton("No hacer nada", new DialogInterface.OnClickListener() {
                     public void onClick(final DialogInterface dialog, final int id) {
 
-                        dialog.cancel();
+                        //dialog.cancel();
                     }
                 })
         ;

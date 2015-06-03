@@ -1,41 +1,36 @@
 package registro.eingv.uabc.registroeingv;
 
-import android.graphics.Color;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Point;
-import android.location.Location;
 import android.speech.tts.TextToSpeech;
-import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentManager;
 import android.util.Log;
+import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.AdapterView;
-import android.widget.EditText;
-import android.widget.ImageView;
-import android.widget.SeekBar;
 import android.widget.Toast;
-
-import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.location.Geofence;
-import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.Projection;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolygonOptions;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
 import registro.eingv.uabc.registroeingv.db.Registro;
-import registro.eingv.uabc.registroeingv.db.RegistroDao;
+import registro.eingv.uabc.registroeingv.dialogo.Dialogo;
 
 
 public class ActivityMaps extends android.support.v4.app.FragmentActivity implements TextToSpeech.OnInitListener {
@@ -100,14 +95,11 @@ public class ActivityMaps extends android.support.v4.app.FragmentActivity implem
 
         mapa.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
             public boolean onMarkerClick(Marker marker) {
-
-                      engine.speak(marker.getSnippet().toString(), TextToSpeech.QUEUE_FLUSH,null);
-
+                     // engine.speak(marker.getSnippet().toString(), TextToSpeech.QUEUE_FLUSH,null);
                 Toast.makeText(
                         ActivityMaps.this,
                         "Marcador pulsado:\n" +
                                 marker.getTitle(),
-
                         Toast.LENGTH_SHORT).show();
                 return false;
             }
@@ -142,8 +134,6 @@ public class ActivityMaps extends android.support.v4.app.FragmentActivity implem
             CameraUpdateFactory.newLatLng(new LatLng(dato.getLatitud(), dato.getLongitud()));
             mapa.moveCamera(camUpd1);
 }
-
-
                 break;
             case R.id.menu_animar:
         animm();
@@ -161,6 +151,7 @@ public class ActivityMaps extends android.support.v4.app.FragmentActivity implem
                     CameraUpdate cameraUpdate=CameraUpdateFactory.newCameraPosition(camPos);
                     mapa.animateCamera(cameraUpdate);
                 }
+
                 break;
 
             /*case R.id.menu_posicion:
@@ -207,14 +198,23 @@ public class ActivityMaps extends android.support.v4.app.FragmentActivity implem
         //Obtener la lista de Registros en la BD
         lista3 = SingletonDB.getInstance().getDaoSession().getRegistroDao().loadAll();
 
+        Bitmap bitmap;
+        //= BitmapFactory.decodeByteArray(this.listaRegistro.get(position).getFoto(), 0, this.listaRegistro.get(position).getFoto().length);//recupero el bitmap
+
+//        foto.setImageBitmap(this.listaRegistro.get(position).getFoto());
+
         for (Registro dato:lista3){
-            LatLng re=new LatLng(dato.getLatitud(),dato.getLongitud());
+
+         bitmap=BitmapFactory.decodeByteArray((dato.getImagen()), 0, (dato.getImagen()).length);
+
+            LatLng re = new LatLng(dato.getLatitud(), dato.getLongitud());
             mapa.addMarker(new MarkerOptions()
                             .title(dato.getLugar())
                             .snippet(dato.getDescripcion())
                             .position(re)
+                  // .icon(BitmapDescriptorFactory.fromBitmap(bitmap))
 
-                                            );
+            );
             }
         }
     private void mostrarLineas(){
@@ -263,7 +263,7 @@ public class ActivityMaps extends android.support.v4.app.FragmentActivity implem
             List<Registro> list;
             list=SingletonDB.getInstance().getDaoSession().getRegistroDao().loadAll();
             for (Registro dato:list){
-//                engine.speak((dato.getDescripcion()).toString(),TextToSpeech.QUEUE_ADD,null); ////lee todo los datos
+//                engine.speak((dato.getDescripcion()).toString(),TextToSpeech.QUEUE_ADD,null); ////lee todos los datos
               //  engine.speak(dato.getLugar().toString(), TextToSpeech.QUEUE_FLUSH,null);
                 engine.speak(dato.getDescripcion().toString(), TextToSpeech.QUEUE_FLUSH,null);
             }

@@ -1,11 +1,16 @@
 package registro.eingv.uabc.registroeingv.lista;
 
 import android.content.Context;
+import android.content.res.Resources;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.List;
 
@@ -51,13 +56,31 @@ public class ListaRegistroAdapter extends BaseAdapter {
 
 
         if(!this.listaRegistro.isEmpty()) {
+            Bitmap bitmap;
 
-            TextView textViewClave=(TextView)convertView.findViewById(R.id.textViewClave);
-            TextView textViewCoordenadas=(TextView)convertView.findViewById(R.id.textViewCoordenadas);
+            bitmap=BitmapFactory.decodeByteArray(
+                  (this.listaRegistro.get(position).getImagen())
+               ,0,(this.listaRegistro.get(position).getImagen()).length);
+            if (bitmap!=null){
 
-            textViewClave.setText(this.listaRegistro.get(position).get_id()+": "+this.listaRegistro.get(position).getLugar());
+                ImageView imageView= (ImageView) convertView.findViewById(R.id.imagId);
+                imageView.setImageBitmap(Bitmap.createBitmap(bitmap));
 
-            textViewCoordenadas.setText("[ "+this.listaRegistro.get(position).getLatitud() + " ] , [ "  + this.listaRegistro.get(position).getLongitud()+ "]");
+                TextView textViewClave=(TextView)convertView.findViewById(R.id.textViewClave);
+                TextView textViewCoordenadas=(TextView)convertView.findViewById(R.id.textViewCoordenadas);
+
+                textViewClave.setText(this.listaRegistro.get(position).get_id()+": "+this.listaRegistro.get(position).getLugar());
+                textViewCoordenadas.setText("[ "+this.listaRegistro.get(position).getLatitud() + " ] , [ "  + this.listaRegistro.get(position).getLongitud()+ "]");
+            }
+            else {
+                TextView textViewClave=(TextView)convertView.findViewById(R.id.textViewClave);
+                TextView textViewCoordenadas=(TextView)convertView.findViewById(R.id.textViewCoordenadas);
+
+                textViewClave.setText(this.listaRegistro.get(position).get_id()+": "+this.listaRegistro.get(position).getLugar());
+
+                textViewCoordenadas.setText("[ "+this.listaRegistro.get(position).getLatitud() + " ] , [ "  + this.listaRegistro.get(position).getLongitud()+ "]");
+
+            }
 
         }
         return convertView;
